@@ -53,3 +53,88 @@ export GOPROXY=https://goproxy.cn
 - 运行`go get [包名]@[版本号]`命令会下载对应包的指定版本或者将对应包升级到指定的版本。
 
 提示：`go get [包名]@[版本号]`命令中版本号可以是 x.y.z 的形式，例如 go get foo@v1.2.3，也可以是 git 上的分支或 tag，例如 go get foo@master，还可以是 git 提交时的哈希值，例如 go get foo@e3702bed2。
+
+## 如何在项目中使用
+
+#### 创建一个新项目：
+
+1) 在 GOPATH 目录之外新建一个目录，并使用`go mod init`初始化生成 go.mod 文件:
+go mod init hello
+go: creating new go.mod: module hello
+
+go.mod 文件一旦创建后，它的内容将会被 go toolchain 全面掌控，go toolchain 会在各类命令执行时，比如`go get`、`go build`、`go mod`等修改和维护 go.mod 文件。
+
+go.mod 提供了 module、require、replace 和 exclude 四个命令：
+
+- module 语句指定包的名字（路径）；
+- require 语句指定的依赖项模块；
+- replace 语句可以替换依赖项模块；
+- exclude 语句可以忽略依赖项模块。
+
+初始化生成的 go.mod 文件如下所示：
+
+module hello
+go 1.13
+
+2) 添加依赖。
+新建一个 main.go 文件，写入以下代码：
+```go
+    package main
+    import (
+        "net/http"
+        "github.com/labstack/echo"
+    )
+    func main() {
+        e := echo.New()
+        e.GET("/", func(c echo.Context) error {
+            return c.String(http.StatusOK, "Hello, World!")
+        })
+        e.Logger.Fatal(e.Start(":1323"))
+    }
+```
+执行`go run main.go`运行代码会发现 go mod 会自动查找依赖自动下载
+
+go 会自动生成一个 go.sum 文件来记录 dependency tree
+
+再次执行脚本`go run main.go`发现跳过了检查并安装依赖的步骤。
+
+可以使用命令`go list -m -u all`来检查可以升级的 package，使用`go get -u need-upgrade-package`升级后会将新的依赖版本更新到 go.mod * 也可以使用`go get -u`升级所有依赖。
+
+#### 使用内部包
+
+增加文件 api/api.go
+
+```go
+    package api
+    import (
+        "net/http"
+        "github.com/labstack/echo"
+    )
+    func HelloWorld(c echo.Context) error {
+        return c.JSON(http.StatusOK, "hello world")
+    }
+```
+
+
+
+运行`go run main.go` 会出现 `build _/D_/code/src/api: cannot find module for path _/D_/code/src/api`的错误
+
+这是因为 main.go 中使用 internal package 的方法跟以前已经不同了，由于 go.mod 会扫描同工作目录下所有  package 并且变更引入方法，必须将 hello 当成路径的前缀，也就是需要写成 import hello/api（包的 模块内的绝对路径来导入，就是要从go.mod所在的目录开始），以往  GOPATH/dep 模式允许的 import ./api 已经失效。
+
+main.go 导入api 的方式 改成 `import api "hello/api"` 再次运行`go run main.go` 就正常了。
+
+下面就跟正常进行其他开发了。
+
+## 使用 replace 替换无法直接获取的 package
+
+由于某些已知的原因，并不是所有的 package 都能成功下载，比如：golang.org 下的包。
+
+ modules 可以通过在 go.mod 文件中使用 replace 指令替换成 github 上对应的库，比如：
+
+replace (
+   golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a => github.com/golang/crypto v0.0.0-20190313024323-a1f597ede03a
+ )
+
+或者
+
+replace golang.org/x/crypto v0.0.0-20190313024323-a1f597ede03a => github.com/golang/crypto v0.0.0-20190313024323-a1f597ede03a
