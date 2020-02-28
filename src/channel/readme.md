@@ -161,3 +161,103 @@ func main() {
 }
 ```
 
+## 单向通道的声明格式
+我们在将一个 channel 变量传递到一个函数时，可以通过将其指定为单向 channel 变量，从而限制该函数中可以对此 channel 的操作，比如只能往这个 channel 写，或者只能从这个 channel 读。
+
+单向 channel 变量的声明非常简单，只能发送的通道类型为`chan<-`，只能接收的通道类型为`<-chan`，格式如下：
+`var 通道实例 chan<- 元素类型   // 只能发送通道`
+`var 通道实例 <-chan 元素类型   // 只能接收通道`
+
+- 元素类型：通道包含的元素类型。
+- 通道实例：声明的通道变量。
+
+```go
+ch := make(chan int)
+// 声明一个只能发送的通道类型, 并赋值为ch
+var chSendOnly chan<- int = ch
+//声明一个只能接收的通道类型, 并赋值为ch
+var chRecvOnly <-chan int = ch
+```
+上面的例子中，chSendOnly 只能发送数据，如果尝试接收数据，将会出现如下报错：
+`invalid operation: <-chSendOnly (receive from send-only type chan<- int)`
+同理，chRecvOnly 也是不能发送的。
+
+## 关闭 channel
+关闭 channel 非常简单，直接使用 Go语言内置的 close() 函数即可：
+`close(ch)`
+
+在介绍了如何关闭 channel 之后，我们就多了一个问题：如何判断一个 channel 是否已经被关闭？我们可以在读取的时候使用多重返回值的方式：
+`x, ok := <-ch`
+
+这个用法与 map 中的按键获取 value 的过程比较类似，只需要看第二个 bool 返回值即可，如果返回值是 false 则表示 ch 已经被关闭。
+
+# Go语言无缓冲的通道
+
+Go语言中无缓冲的通道（unbuffered channel）是指在接收前没有能力保存任何值的通道。这种类型的通道要求发送 goroutine 和接收 goroutine 同时准备好，才能完成发送和接收操作。
+
+ 如果两个 goroutine 没有同时准备好，通道会导致先执行发送或接收操作的 goroutine 阻塞等待。这种对通道进行发送和接收的交互行为本身就是同步的。其中任意一个操作都无法离开另一个操作单独存在。
+
+ 阻塞指的是由于某种原因数据没有到达，当前协程（线程）持续处于等待状态，直到条件满足才解除阻塞。
+
+ 同步指的是在两个或多个协程（线程）之间，保持数据内容一致性的机制。
+
+【示例 1】在网球比赛中，两位选手会把球在两个人之间来回传递。选手总是处在以下两种状态之一，要么在等待接球，要么将球打向对方。可以使用两个 goroutine 来模拟网球比赛，并使用无缓冲的通道来模拟球的来回，代码如下所示。
+
+```go
+    // 这个示例程序展示如何用无缓冲的通道来模拟
+    // 2 个goroutine 间的网球比赛
+    package main
+    import (
+        "fmt"
+        "math/rand"
+        "sync"
+        "time"
+    )
+    // wg 用来等待程序结束
+    var wg sync.WaitGroup
+    func init() {
+        rand.Seed(time.Now().UnixNano())
+    }
+    // main 是所有Go 程序的入口
+    func main() {
+        // 创建一个无缓冲的通道
+        court := make(chan int)
+        // 计数加 2，表示要等待两个goroutine
+        wg.Add(2)
+        // 启动两个选手
+        go player("Nadal", court)
+        go player("Djokovic", court)
+        // 发球
+        court <- 1
+        // 等待游戏结束
+        wg.Wait()
+    }
+    // player 模拟一个选手在打网球
+    func player(name string, court chan int) {
+        // 在函数退出时调用Done 来通知main 函数工作已经完成
+        defer wg.Done()
+        for {
+            // 等待球被击打过来
+            ball, ok := <-court
+            if !ok {
+                // 如果通道被关闭，我们就赢了
+                fmt.Printf("Player %s Won\n", name)
+                return
+            }
+            // 选随机数，然后用这个数来判断我们是否丢球
+            n := rand.Intn(100)
+            if n%13 == 0 {
+                fmt.Printf("Player %s Missed\n", name)
+                // 关闭通道，表示我们输了
+                close(court)
+                return
+            }
+            // 显示击球数，并将击球数加1
+            fmt.Printf("Player %s Hit %d\n", name, ball)
+            ball++
+            // 将球打向对手
+            court <- ball
+        }
+    }
+```
+
