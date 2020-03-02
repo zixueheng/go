@@ -1,3 +1,9 @@
 package main
 
-func main() {}
+import "fmt"
+
+// Timer
+
+func main() {
+	fmt.Println("qqq")
+}
