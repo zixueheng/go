@@ -31,6 +31,9 @@ func demo2() {
 	fmt.Println("结束了")
 }
 
+// time.AfterFunc() 函数是在 time.After 基础上增加了到时的回调，方便使用。
+// 而 time.After() 函数又是在 time.NewTimer() 函数上进行的封装
+
 func main() {
 	// demo1()
 	// 先瞬间打印出前两行，然后等待3S，打印后后两行。

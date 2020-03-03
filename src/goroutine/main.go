@@ -64,4 +64,5 @@ func main() {
 	// demo2()
 
 	// fmt.Println(runtime.NumCPU()) // 获取CPU核数
+	// runtime.GOMAXPROCS(4) //设置需要用到的cpu数量
 }
