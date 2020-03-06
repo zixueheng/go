@@ -1,5 +1,6 @@
-// netcat 是一个简单的TCP服务器读/写客户端
 package main
+
+// netcat 是一个简单的TCP服务器读/写客户端
 
 import (
 	"io"
