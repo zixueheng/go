@@ -125,7 +125,9 @@ func main() {
 
 	// demo5()
 
-	demo6()
+	// demo6()
+
+	demo7()
 }
 
 // 对指针获取反射对象时，可以通过 reflect.Elem() 方法获取这个指针指向的元素类型。这个获取过程被称为取元素，等效于对指针类型变量做了一个*操作
@@ -167,3 +169,26 @@ func demo6() {
 	// *aIns = 11
 	// fmt.Println(*aIns)
 }
+
+// 反射调用函数
+// 如果反射值对象（reflect.Value）中值的类型为函数时，可以通过 reflect.Value 调用该函数。
+// 使用反射调用函数时，需要将参数使用反射值对象的切片 []reflect.Value 构造后传入 Call() 方法中，调用完成时，函数的返回值通过 []reflect.Value 返回。
+func demo7() {
+	var fn = func(a, b int) int {
+		return a + b
+	}
+	// 将函数包装为反射值对象
+	funcValue := reflect.ValueOf(fn)
+
+	// 构造函数参数, 传入两个整型值
+	// 将 10 和 20 两个整型值使用 reflect.ValueOf 包装为 reflect.Value，再将反射值对象的切片 []reflect.Value 作为函数的参数。
+	paramList := []reflect.Value{reflect.ValueOf(10), reflect.ValueOf(20)}
+
+	// 反射调用函数
+	retList := funcValue.Call(paramList)
+	// 获取第一个返回值, 取整数值
+	fmt.Println(retList[0].Int()) // 30
+}
+
+// 反射调用函数的过程需要构造大量的 reflect.Value 和中间变量，对函数参数值进行逐一检查，还需要将调用参数复制到调用函数的参数内存中。
+// 调用完毕后，还需要将返回值转换为 reflect.Value，用户还需要从中取出调用值。因此，反射调用函数的性能问题尤为突出，不建议大量使用反射函数调用
