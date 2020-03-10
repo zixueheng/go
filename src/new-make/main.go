@@ -7,17 +7,20 @@ func main() {
 	// func new(Type) *Type
 	// new 函数只接受一个参数，这个参数是一个类型，并且返回一个指向该类型内存地址的指针。同时 new 函数会把分配的内存置为零，也就是类型的零值。
 	var sum *int
-	sum = new(int)    //分配空间，返回的是指针
+	// 对于指针类型变量要先分配空间后才能赋值，所以下面的语句会报错
+	// sum = 1 // cannot use 1 (type int) as type *int in assignment
+	sum = new(int)    // 分配空间，返回的是指针
 	fmt.Println(*sum) // 0
 	*sum = 98
 	fmt.Println(*sum) // 98
+
 	// new 函数不仅仅能够为系统默认的数据类型，分配空间，自定义类型也可以使用 new 函数来分配空间:
 	type Student struct {
 		name string
 		age  int
 	}
 	var s *Student
-	s = new(Student) //分配空间，返回的是指针
+	s = new(Student) // 分配空间，返回的是指针
 	(*s).name = "dequan"
 	fmt.Println(*s) // {dequan 0}
 
