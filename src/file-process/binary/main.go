@@ -14,6 +14,7 @@ import (
 
 // 在有些情况下我们可能需要与一些使用自定义二进制格式的软件交互，因此了解如何处理二进制文件就非常有用。
 
+// Website 结构体
 type Website struct {
 	Url int32
 }
