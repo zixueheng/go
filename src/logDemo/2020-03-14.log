@@ -1,0 +1,6 @@
+[2020-03-14 15:55:17] [main.go:main.main:31] [WARNING] 一条Warning日志
+[2020-03-14 15:55:17] [main.go:main.main:32] [ERROR] 一条Error日志
+[2020-03-14 15:55:17] [main.go:main.main:33] [FATAL] 一条Fatal日志
+[2020-03-14 16:00:31] [main.go:main.main:31] [WARNING] 一条Warning日志2
+[2020-03-14 16:00:31] [main.go:main.main:32] [ERROR] 一条Error日志2
+[2020-03-14 16:00:31] [main.go:main.main:33] [FATAL] 一条Fatal日志2

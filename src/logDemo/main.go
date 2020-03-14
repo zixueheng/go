@@ -24,11 +24,11 @@ func main() {
 	// log.Println("记录到文件中的日志") // 这里会输出到 log.log 文件中
 
 	// 使用自己编写的logger包
-	logger := logger.NewLogger(logger.Warning)
+	logger := logger.CreateLogger(logger.WARNING)
 	logger.Debug("一条Debug日志")
 	logger.Trace("一条Trace日志")
 	logger.Info("一条Info日志")
-	logger.Warning("一条Warning日志")
-	logger.Error("一条Error日志")
-	logger.Fatal("一条Fatal日志")
+	logger.Warning("一条Warning日志2")
+	logger.Error("一条Error日志2")
+	logger.Fatal("一条Fatal日志2")
 }
