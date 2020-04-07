@@ -18,6 +18,7 @@ pkg/
 github.com/
 golang.org/
 .idea/
+.vscode/
 
 .DS_Store
 */.DS_Store
