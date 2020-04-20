@@ -19,6 +19,13 @@ func main() {
 	value, ok := x.(int)
 	fmt.Println(value, ok)
 	// 10 true
+	
+	// 用一个参数接收时
+	v := x.(int)  //这里要确保 x 的动态类型是 他的实际类型 int，否则会panic
+	fmt.Println(v) // 10
+
+	// b := x.(string) // panic: interface conversion: interface {} is int, not string
+	// fmt.Println(b)
 
 	value1, ok1 := x.(float32)
 	fmt.Println(value1, ok1)
