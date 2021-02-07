@@ -20,9 +20,9 @@ func main() {
 	go func() {
 		for {
 			select {
-			case num := <-ch:
+			case num := <-ch: // 持续接收数据
 				fmt.Println("num = ", num)
-			case <-time.After(3 * time.Second): // 这里意思等待3秒后，进行超时操作（<-是在通道里面取值了，会阻塞执行）
+			case <-time.After(5 * time.Second): // 这里意思等待5秒后，进行超时操作（<-是在通道里面取值了，会阻塞执行）
 				fmt.Println("超时")
 				quit <- true // quit 里面放入 true
 			}

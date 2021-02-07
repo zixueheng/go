@@ -19,6 +19,7 @@ github.com/
 golang.org/
 .idea/
 .vscode/
+.bak/
 
 .DS_Store
 */.DS_Store

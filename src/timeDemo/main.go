@@ -44,6 +44,14 @@ func main() {
 	fmt.Println(timeObj.Unix())             // 1581041410
 	fmt.Println(TimeFormat(timeObj.Unix())) // 2020-02-07 10:10:10
 
+	fmt.Println("当前时间加两个小时")
+
+	now1 := time.Now()
+	fmt.Println(TimeFormat2(now1,""))
+	t := now1.Add(time.Hour * time.Duration(2))
+	fmt.Println(TimeFormat2(t,""))
+	fmt.Println()
+
 	// 两个时间相减
 	dur := now.Sub(timeObj)
 	fmt.Println(dur.String())  // 2h22m2.7206038s
@@ -52,4 +60,12 @@ func main() {
 	// 睡眠 Sleep
 	time.Sleep(time.Duration(5 * time.Second)) // Sleep() 接收的参数是纳秒数的 time.Duration 类型，5 * time.Second 是5秒的纳秒数，然后强制转换成 time.Duration 类型（Duration其实是 int64类型）
 	fmt.Println("5秒过去了。。。")
+}
+
+// TimeFormat 时间格式化
+func TimeFormat2(t time.Time, f string) string {
+	if len(f) == 0 {
+		f = "2006-01-02 15:04:05"
+	}
+	return t.Format(f)
 }
